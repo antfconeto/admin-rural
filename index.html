@@ -204,6 +204,20 @@ table.tbl tr:nth-child(odd):not(:first-child){background:var(--card);}
 .slide.dark .foot{color:var(--cream-text-soft);opacity:.75;}
 .divider{border-top:1px solid var(--line);margin:4px 0;}
 
+/* ---------- custom video controls (native <video controls> misrenders on mobile
+   once the stage is CSS-scaled, so we draw our own — plain DOM, scales correctly) ---------- */
+.video-frame{display:block;}
+.video-frame video{vertical-align:bottom;}
+.vid-controls{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;
+  padding:14px 16px;background:linear-gradient(0deg, rgba(0,0,0,.7), rgba(0,0,0,0));z-index:1;}
+.vid-play{width:36px;height:36px;flex-shrink:0;border-radius:50%;border:none;background:rgba(255,255,255,.18);
+  color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.vid-play:active{background:rgba(255,255,255,.32);}
+.vid-progress{flex:1;height:16px;display:flex;align-items:center;cursor:pointer;}
+.vid-progress-track{width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,.28);position:relative;}
+.vid-progress-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--gold);border-radius:3px;}
+.vid-time{color:#fff;font-size:14px;font-variant-numeric:tabular-nums;flex-shrink:0;}
+
 /* ---------- nav ui ---------- */
 .progress{position:fixed;top:0;left:0;height:5px;background:linear-gradient(90deg,var(--gold),#e8c25f);
   z-index:80;transition:width .5s cubic-bezier(.22,.61,.36,1);box-shadow:0 0 12px rgba(200,155,60,.6);}
@@ -961,10 +975,19 @@ table.tbl tr:nth-child(odd):not(:first-child){background:var(--card);}
       </div>
       <div class="kicker-wrap"><span class="kicker on-dark rv rv-up d0">Bônus</span></div>
       <div class="row" style="flex:1;justify-content:center;align-items:center">
-        <video class="rv rv-pop d2" controls preload="metadata" style="position:relative;z-index:3;max-height:820px;max-width:461px;border-radius:20px;border:2px solid rgba(245,241,227,.25);box-shadow:0 30px 80px rgba(0,0,0,.5);background:#000">
-          <source src="assets/encerramento-video.mp4" type="video/mp4">
-          Seu navegador não suporta vídeo embutido.
-        </video>
+        <div class="video-frame rv rv-pop d2" id="videoFrame" style="position:relative;z-index:3;border-radius:20px;overflow:hidden;border:2px solid rgba(245,241,227,.25);box-shadow:0 30px 80px rgba(0,0,0,.5);background:#000;line-height:0">
+          <video id="bonusVideo" playsinline webkit-playsinline preload="metadata" style="display:block;max-height:820px;max-width:461px;width:auto;height:auto">
+            <source src="assets/encerramento-video.mp4" type="video/mp4">
+            Seu navegador não suporta vídeo embutido.
+          </video>
+          <div class="vid-controls">
+            <button class="vid-play" id="vidPlayBtn" type="button" aria-label="Reproduzir">
+              <svg viewBox="0 0 24 24" width="16" height="16"><path class="ic-play" d="M8 5v14l11-7z" fill="currentColor"/><g class="ic-pause" style="display:none"><rect x="6" y="5" width="4" height="14" fill="currentColor"/><rect x="14" y="5" width="4" height="14" fill="currentColor"/></g></svg>
+            </button>
+            <div class="vid-progress" id="vidProgress"><div class="vid-progress-track"><div class="vid-progress-fill" id="vidProgressFill"></div></div></div>
+            <span class="vid-time" id="vidTime">0:00</span>
+          </div>
+        </div>
       </div>
       <div class="foot"><span></span><span>14 / 15</span></div>
     </section>
@@ -1172,7 +1195,6 @@ table.tbl tr:nth-child(odd):not(:first-child){background:var(--card);}
   <button id="nextBtn" aria-label="Próximo">›</button>
   <button id="fsBtn" aria-label="Tela cheia" style="margin-left:4px">⛶</button>
 </div>
-<div class="hint" id="hint">← → navega entre slides · F tela cheia · os elementos animam sozinhos</div>
 
 <script>
 (function(){
@@ -1244,6 +1266,57 @@ table.tbl tr:nth-child(odd):not(:first-child){background:var(--card);}
   window.addEventListener('mousemove', wake);
   window.addEventListener('click', wake);
   wake();
+
+  /* custom video controls — native <video controls> can misrender/overlap
+     on mobile once an ancestor uses CSS transform:scale (this deck's stage
+     scaling), so this is plain DOM instead, which scales correctly */
+  (function(){
+    var vid = document.getElementById('bonusVideo');
+    if(!vid) return;
+    var playBtn = document.getElementById('vidPlayBtn');
+    var progress = document.getElementById('vidProgress');
+    var fill = document.getElementById('vidProgressFill');
+    var timeEl = document.getElementById('vidTime');
+    var icPlay = playBtn.querySelector('.ic-play');
+    var icPause = playBtn.querySelector('.ic-pause');
+
+    function fmt(s){
+      if(!isFinite(s)) return '0:00';
+      var m = Math.floor(s / 60), ss = Math.floor(s % 60);
+      return m + ':' + (ss < 10 ? '0' : '') + ss;
+    }
+    function setPlayIcon(playing){
+      icPlay.style.display = playing ? 'none' : '';
+      icPause.style.display = playing ? '' : 'none';
+    }
+    function toggle(){
+      if(vid.paused) vid.play(); else vid.pause();
+    }
+    playBtn.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
+    vid.addEventListener('click', toggle);
+    vid.addEventListener('play', function(){ setPlayIcon(true); });
+    vid.addEventListener('pause', function(){ setPlayIcon(false); });
+    vid.addEventListener('timeupdate', function(){
+      var pct = vid.duration ? (vid.currentTime / vid.duration * 100) : 0;
+      fill.style.width = pct + '%';
+      timeEl.textContent = fmt(vid.currentTime);
+    });
+    vid.addEventListener('loadedmetadata', function(){ timeEl.textContent = fmt(vid.currentTime); });
+
+    function seekFromEvent(clientX){
+      var r = progress.getBoundingClientRect();
+      var pct = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+      if(vid.duration) vid.currentTime = pct * vid.duration;
+    }
+    progress.addEventListener('click', function(e){
+      e.stopPropagation();
+      seekFromEvent(e.clientX);
+    });
+    progress.addEventListener('touchstart', function(e){
+      e.stopPropagation();
+      if(e.touches && e.touches[0]) seekFromEvent(e.touches[0].clientX);
+    }, {passive:true});
+  })();
 
   render();
 })();
