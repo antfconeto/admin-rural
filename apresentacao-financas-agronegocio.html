@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Finanças no Agronegócio</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Domine:wght@400..700&family=Nunito+Sans:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  --green-900:#101a08; --green-800:#1B2814; --green-700:#2C4020; --green-600:#3E5A2E;
+  --cream:#F8F5EC; --cream-2:#F0EEDD; --card:#FFFDF6;
+  --ink:#22301C; --ink-soft:#4A5A3D; --ink-faint:#8A9478; --line:#E3DFC9;
+  --gold:#C89B3C; --gold-soft:#F0E4C2; --gold-deep:#8A6A20;
+  --cream-text:#F5F1E3; --cream-text-soft:#D9D3BC;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;margin:0;}
+body{background:#0a0d07;font-family:'Nunito Sans',Arial,sans-serif;overflow:hidden;}
+h1,h2,h3{font-family:'Domine',Georgia,serif;margin:0;}
+p,li{margin:0;}
+ul{margin:0;padding-left:26px;}
+svg{display:block;}
+
+/* ---------- stage ---------- */
+.stage-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;}
+.stage{position:relative;width:1920px;height:1080px;background:var(--cream);border-radius:6px;
+  box-shadow:0 50px 140px rgba(0,0,0,.5);overflow:hidden;flex-shrink:0;transform-origin:center center;}
+
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;padding:96px 110px;color:var(--ink);
+  opacity:0;pointer-events:none;transform:translateX(80px) scale(.96);
+  transition:opacity .6s cubic-bezier(.22,.61,.36,1), transform .6s cubic-bezier(.22,.61,.36,1);}
+.slide.dark{color:var(--cream-text);background:linear-gradient(160deg,var(--green-800) 0%,var(--green-700) 55%,var(--green-600) 100%);}
+.slide:not(.dark){background:var(--cream);}
+.slide.active{opacity:1;transform:translateX(0) scale(1);pointer-events:auto;z-index:5;}
+.slide.before{transform:translateX(-80px) scale(.96);}
+.slide.after{transform:translateX(80px) scale(.96);}
+
+/* ---------- background photos ---------- */
+.bg-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.6) saturate(1.05);}
+.bg-overlay{position:absolute;inset:0;background:linear-gradient(160deg, rgba(27,40,20,.84) 0%, rgba(44,64,32,.74) 55%, rgba(62,90,46,.56) 100%);}
+
+/* ---------- reveal on arrival (plays automatically, no click needed) ---------- */
+.rv{opacity:0;}
+.slide.active .rv{animation-duration:.7s;animation-fill-mode:forwards;animation-timing-function:cubic-bezier(.22,.61,.36,1);}
+.rv-up{transform:translateY(26px);}
+.slide.active .rv-up{animation-name:revealUp;}
+.rv-pop{transform:scale(.72) translateY(14px);}
+.slide.active .rv-pop{animation-name:popIn;animation-timing-function:cubic-bezier(.34,1.56,.64,1);}
+.rv-left{transform:translateX(-48px);}
+.slide.active .rv-left{animation-name:slideInLeft;}
+.rv-right{transform:translateX(48px);}
+.slide.active .rv-right{animation-name:slideInRight;}
+.rv-rot{transform:rotate(-7deg) scale(.9);}
+.slide.active .rv-rot{animation-name:rotateIn;}
+.rv-row{opacity:0;}
+.slide.active .rv-row{animation-name:fadeRow;animation-duration:.5s;}
+
+@keyframes revealUp{to{opacity:1;transform:translateY(0);}}
+@keyframes popIn{0%{opacity:0;transform:scale(.72) translateY(14px);}65%{opacity:1;transform:scale(1.05) translateY(-3px);}100%{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes slideInLeft{from{opacity:0;transform:translateX(-48px);}to{opacity:1;transform:translateX(0);}}
+@keyframes slideInRight{from{opacity:0;transform:translateX(48px);}to{opacity:1;transform:translateX(0);}}
+@keyframes rotateIn{from{opacity:0;transform:rotate(-7deg) scale(.9);}to{opacity:1;transform:rotate(0) scale(1);}}
+@keyframes fadeRow{to{opacity:1;}}
+
+.d0{animation-delay:.03s}.d1{animation-delay:.11s}.d2{animation-delay:.19s}.d3{animation-delay:.27s}
+.d4{animation-delay:.35s}.d5{animation-delay:.43s}.d6{animation-delay:.51s}.d7{animation-delay:.59s}
+.d8{animation-delay:.67s}
+
+/* ---------- continuous / ambient motion (always running) ---------- */
+.blob{position:absolute;border-radius:50%;pointer-events:none;}
+.blob.b1{width:640px;height:640px;right:-160px;top:-190px;background:rgba(200,155,60,.15);animation:floatY 8s ease-in-out infinite;}
+.blob.b2{width:170px;height:170px;right:110px;top:110px;background:var(--gold);opacity:.92;animation:floatY 5.5s ease-in-out infinite reverse, pulseSoft 4s ease-in-out infinite;}
+.blob.b3{width:600px;height:600px;left:-170px;bottom:-210px;background:rgba(200,155,60,.13);animation:floatY 9s ease-in-out infinite;}
+.blob.b4{width:140px;height:140px;left:120px;bottom:150px;background:var(--gold);opacity:.9;animation:floatY 6s ease-in-out infinite reverse, pulseSoft 4.5s ease-in-out infinite;}
+@keyframes floatY{0%,100%{transform:translateY(0);}50%{transform:translateY(-22px);}}
+@keyframes pulseSoft{0%,100%{opacity:.95;}50%{opacity:.6;}}
+.hr-line{position:absolute;left:0;width:1920px;height:2px;background:rgba(245,241,227,.16);}
+
+.cloud{position:absolute;background:rgba(245,241,227,.15);border-radius:60px;filter:blur(1px);animation:driftX 26s ease-in-out infinite;}
+.cloud.c1{width:220px;height:56px;top:86px;left:14%;animation-duration:30s;}
+.cloud.c2{width:150px;height:42px;top:160px;left:58%;animation-duration:22s;animation-direction:reverse;}
+@keyframes driftX{0%,100%{transform:translateX(0);}50%{transform:translateX(90px);}}
+
+.spin-slow{animation:spinTurn 9s linear infinite;}
+.spin-slower{animation:spinTurn 16s linear infinite;}
+@keyframes spinTurn{to{transform:rotate(360deg);}}
+.pulse-icon{animation:iconPulse 2.3s ease-in-out infinite;}
+@keyframes iconPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+.wiggle-icon{animation:iconWiggle 3.4s ease-in-out infinite;transform-origin:60% 60%;}
+@keyframes iconWiggle{0%,100%{transform:rotate(0deg);}50%{transform:rotate(-12deg);}}
+.flow-x{animation:flowX 1.4s ease-in-out infinite;}
+@keyframes flowX{0%,100%{transform:translateX(0);opacity:.7;}50%{transform:translateX(7px);opacity:1;}}
+
+.flow-track{position:relative;height:6px;background:rgba(200,155,60,.22);border-radius:3px;overflow:hidden;}
+.flow-track .dot{position:absolute;top:0;left:-140px;width:140px;height:100%;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:trackFlow 2.8s linear infinite;}
+@keyframes trackFlow{0%{left:-140px;}100%{left:100%;}}
+
+/* little tractor driving across the scene */
+.tractor-wrap{position:absolute;left:-20%;bottom:206px;width:250px;height:97px;z-index:2;
+  animation:driveAcross 24s linear infinite;animation-delay:1.1s;}
+.tractor-wrap svg{width:100%;height:100%;overflow:visible;
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.55)) drop-shadow(0 0 3px rgba(0,0,0,.7));}
+@keyframes driveAcross{0%{left:-20%;}100%{left:118%;}}
+.wheel-rear,.wheel-front{transform-box:fill-box;transform-origin:50% 50%;}
+.wheel-rear{animation:spinFast .85s linear infinite;}
+.wheel-front{animation:spinFast .55s linear infinite;}
+@keyframes spinFast{to{transform:rotate(360deg);}}
+.puff{opacity:0;transform-box:fill-box;transform-origin:50% 50%;animation:puffUp 2s ease-out infinite;}
+.puff.p1{animation-delay:0s;}.puff.p2{animation-delay:.7s;}.puff.p3{animation-delay:1.4s;}
+@keyframes puffUp{0%{opacity:0;transform:translate(0,0) scale(.45);}18%{opacity:.85;}60%{opacity:.55;transform:translate(-26px,-9px) scale(1.15);}100%{opacity:0;transform:translate(-52px,-4px) scale(1.9);}}
+.dust{opacity:0;transform-box:fill-box;transform-origin:50% 50%;animation:dustPuff 1.1s ease-out infinite;}
+.dust.d1{animation-delay:0s;}.dust.d2{animation-delay:.35s;}
+@keyframes dustPuff{0%{opacity:0;transform:translate(0,0) scale(.4);}30%{opacity:.55;}100%{opacity:0;transform:translate(10px,4px) scale(1.3);}}
+
+/* wheat sprouting behind the planter, harvested when the combine passes */
+.wheat-row{position:absolute;left:0;width:100%;height:0;}
+.wheat{position:absolute;bottom:0;width:15px;height:28px;z-index:1;transform-origin:50% 100%;
+  opacity:0;transform:scaleY(0);
+  animation:wheatGrow 24s ease-in-out infinite backwards;}
+@keyframes wheatGrow{
+  0%{transform:scaleY(0);opacity:0;}
+  4%{transform:scaleY(1);opacity:1;}
+  25%{transform:scaleY(1);opacity:1;}
+  25.3%{transform:scaleY(0);opacity:0;}
+  100%{transform:scaleY(0);opacity:0;}
+}
+
+/* combine harvester following behind, reaping the grown wheat */
+.combine-wrap{position:absolute;left:-20%;bottom:198px;width:210px;height:115px;z-index:2;
+  animation:driveAcross 24s linear infinite;animation-delay:7.1s;}
+.combine-wrap svg{width:100%;height:100%;overflow:visible;
+  filter:drop-shadow(0 5px 9px rgba(0,0,0,.5)) drop-shadow(0 0 3px rgba(0,0,0,.65));}
+.reel-spin{transform-box:fill-box;transform-origin:50% 50%;animation:spinFast .9s linear infinite;}
+
+/* ---------- text components ---------- */
+.kicker-wrap{display:flex;margin-bottom:20px;}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-size:16px;font-weight:800;letter-spacing:2.2px;
+  text-transform:uppercase;color:var(--gold-deep);background:var(--gold-soft);padding:9px 22px;border-radius:999px;}
+.kicker.on-dark{color:var(--green-800);background:var(--gold);}
+h2.title{font-size:46px;font-weight:700;line-height:1.15;color:var(--green-800);margin-bottom:14px;}
+.slide.dark h2.title{color:var(--cream-text);}
+h1.hero{font-size:98px;font-weight:700;line-height:1.05;color:var(--cream-text);}
+.lead{font-size:21px;line-height:1.6;color:var(--ink-soft);max-width:1250px;}
+.slide.dark .lead{color:var(--cream-text-soft);}
+.source-tag{font-size:15px;color:var(--gold-deep);font-weight:700;}
+
+/* ---------- layout helpers ---------- */
+.row{display:flex;gap:26px;}
+.row.center{align-items:center;}
+.row.between{justify-content:space-between;}
+.row.end{align-items:flex-end;}
+.col{display:flex;flex-direction:column;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;}
+.grid-2x3{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:26px;}
+.spacer{flex:1;}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px;}
+.card.dark{background:var(--green-700);border-color:transparent;}
+.card.darker{background:var(--green-800);}
+.card.gold{background:var(--gold);border-color:transparent;}
+.card h3{font-size:25px;font-weight:700;color:var(--green-800);margin-bottom:10px;}
+.card.dark h3,.card.darker h3{color:var(--cream-text);}
+.card.gold h3{color:var(--green-800);}
+.card p{font-size:18px;line-height:1.5;color:var(--ink-soft);}
+.card.dark p,.card.darker p{color:var(--cream-text-soft);}
+.card.gold p{color:#3B2E0E;}
+.card.photo{color:var(--cream-text);}
+.card.photo h3{color:var(--cream-text);}
+.card.photo p{color:var(--cream-text-soft);}
+
+.icon-wrap{width:46px;height:46px;color:var(--gold);margin-bottom:8px;}
+.icon-wrap svg{width:100%;height:100%;}
+.icon-wrap.sm{width:32px;height:32px;margin-bottom:0;}
+.icon-wrap.lg{width:58px;height:58px;}
+
+.num-badge{width:50px;height:50px;border-radius:25px;background:var(--green-600);color:var(--cream);
+  font-family:'Domine',Georgia,serif;font-weight:700;font-size:26px;display:flex;align-items:center;justify-content:center;}
+
+.note-bar{display:flex;align-items:center;gap:22px;background:var(--green-700);border-radius:18px;padding:24px 34px;}
+.note-bar p{font-size:22px;line-height:1.4;color:var(--cream-2);}
+.note-bar.light{background:transparent;border:2px dashed var(--gold);}
+.note-bar.light p{color:var(--ink-soft);}
+
+.pair-row{display:flex;gap:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 26px;align-items:center;}
+.pair-row .k{font-size:20px;font-weight:700;color:var(--green-800);width:360px;flex-shrink:0;}
+.pair-row .v{font-size:20px;font-style:italic;color:var(--gold-deep);}
+.pair-row.accent{background:var(--green-800);}
+.pair-row.accent .k{color:var(--cream);}
+.pair-row.accent .v{color:var(--gold);}
+
+table.tbl{width:100%;border-collapse:collapse;font-size:18px;}
+table.tbl th{background:var(--green-700);color:var(--cream-text);text-align:left;padding:16px 22px;font-weight:700;}
+table.tbl td{padding:16px 22px;border-bottom:1px solid var(--line);}
+table.tbl tr:nth-child(even):not(:first-child){background:var(--cream-2);}
+table.tbl tr:nth-child(odd):not(:first-child){background:var(--card);}
+
+.foot{position:absolute;left:110px;right:110px;bottom:44px;display:flex;justify-content:space-between;
+  align-items:center;font-size:15px;color:var(--ink-faint);}
+.slide.dark .foot{color:var(--cream-text-soft);opacity:.75;}
+.divider{border-top:1px solid var(--line);margin:4px 0;}
+
+/* ---------- nav ui ---------- */
+.progress{position:fixed;top:0;left:0;height:5px;background:linear-gradient(90deg,var(--gold),#e8c25f);
+  z-index:80;transition:width .5s cubic-bezier(.22,.61,.36,1);box-shadow:0 0 12px rgba(200,155,60,.6);}
+.nav{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;
+  background:rgba(12,16,9,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:10px 16px;
+  border-radius:999px;z-index:80;box-shadow:0 14px 34px rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);
+  transition:opacity .4s ease, transform .4s ease;}
+.nav button{width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.09);color:#F5F1E3;
+  font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  transition:background .2s ease,transform .15s ease;}
+.nav button:hover{background:var(--gold);color:#1B2814;transform:scale(1.06);}
+.nav button:active{transform:scale(.94);}
+.nav button.nudge{animation:nudgeShake .4s ease;}
+@keyframes nudgeShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.nav #counter{color:#F5F1E3;font-size:15px;font-weight:700;letter-spacing:.4px;min-width:66px;text-align:center;
+  font-variant-numeric:tabular-nums;}
+.nav.idle{opacity:0;transform:translateX(-50%) translateY(16px);pointer-events:none;}
+.hint{position:fixed;left:28px;bottom:30px;color:rgba(245,241,227,.5);font-size:13px;z-index:80;
+  transition:opacity .4s ease;}
+.hint.idle{opacity:0;}
+
+@media print{
+  body{background:#fff;overflow:visible;}
+  .nav,.progress,.hint,.blob,.tractor-wrap,.cloud{display:none!important;}
+  .stage-wrap{position:static;display:block;}
+  .stage{transform:none!important;box-shadow:none;border-radius:0;margin:0 auto;}
+  .slide{position:relative!important;opacity:1!important;transform:none!important;pointer-events:auto!important;
+    page-break-after:always;break-after:page;}
+  .rv{opacity:1!important;transform:none!important;animation:none!important;}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+<defs>
+<symbol id="icon-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="4" y1="20" x2="4" y2="10"/><line x1="10" y1="20" x2="10" y2="4"/><line x1="16" y1="20" x2="16" y2="13"/><line x1="2" y1="20" x2="22" y2="20"/>
+</symbol>
+<symbol id="icon-activity" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="2,14 7,14 9,6 13,20 15,10 18,14 22,14"/>
+</symbol>
+<symbol id="icon-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="7" cy="17" r="4"/><path d="M10 14 L20 4"/><path d="M15 9 L18 12"/><path d="M18 6 L21 9"/>
+</symbol>
+<symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"/><polyline points="12,7 12,12 16,14"/>
+</symbol>
+<symbol id="icon-warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 3 L22 20 H2 Z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.2" r="0.9" fill="currentColor" stroke="none"/>
+</symbol>
+<symbol id="icon-database" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>
+</symbol>
+<symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6.4 6.5-6.4s6.5 2.8 6.5 6.4"/><circle cx="17.5" cy="9" r="2.6"/><path d="M15.6 14.3c2.6.3 4.6 2.6 4.6 5.7"/>
+</symbol>
+<symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 11 L12 3 L21 11"/><path d="M5 10v10h14V10"/><rect x="10" y="14" width="4" height="6"/>
+</symbol>
+<symbol id="icon-wrench" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-3 3-2-2Z"/>
+</symbol>
+<symbol id="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3c3 3.5 3 14 0 18"/><path d="M12 3c-3 3.5-3 14 0 18"/>
+</symbol>
+<symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="3.4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/>
+</symbol>
+<symbol id="icon-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+</symbol>
+<symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"/><polyline points="8,12.5 11,15.5 16,9"/>
+</symbol>
+<symbol id="icon-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2 20 5.5v6c0 5-3.4 8.3-8 10-4.6-1.7-8-5-8-10v-6Z"/><polyline points="8.5,12 11,14.5 16,9"/>
+</symbol>
+<symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 5c2-1.3 5-1.3 7 0v14c-2-1.3-5-1.3-7 0Z"/><path d="M20 5c-2-1.3-5-1.3-7 0v14c2-1.3 5-1.3 7 0Z"/>
+</symbol>
+<symbol id="icon-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M9 15 15 9"/><path d="M10 6l1.5-1.5a4 4 0 0 1 5.7 5.7L15.7 11.7"/><path d="M14 18l-1.5 1.5a4 4 0 0 1-5.7-5.7L8.3 12.3"/>
+</symbol>
+<symbol id="icon-badge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12 2l2.2 2.4 3.2-.6.7 3.2 3 1.4-1.3 3 1.3 3-3 1.4-.7 3.2-3.2-.6L12 22l-2.2-2.6-3.2.6-.7-3.2-3-1.4 1.3-3-1.3-3 3-1.4.7-3.2 3.2.6Z"/><polyline points="8.5,12 11,14.5 16,9"/>
+</symbol>
+<symbol id="icon-bulb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1.1 1.3 1.1 2.2h5c0-.9.5-1.7 1.1-2.2A6 6 0 0 0 12 3Z"/>
+</symbol>
+<symbol id="icon-thumb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M7 11v9H4v-9Z"/><path d="M7 11l3-8c1.2 0 2 1 2 2v4h5.5c1.2 0 2 1 1.8 2.2l-1.2 6.8c-.2 1.1-1.1 1.9-2.2 1.9H7"/>
+</symbol>
+<symbol id="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <line x1="3" y1="12" x2="20" y2="12"/><polyline points="14,6 20,12 14,18"/>
+</symbol>
+</defs>
+</svg>
+
+<div class="progress" id="progress"></div>
+
+<div class="stage-wrap">
+  <div class="stage" id="stage">
+
+    <!-- 1: COVER -->
+    <section class="slide dark active" data-index="0">
+      <img class="bg-photo" src="assets/soja-goias.jpg" alt="">
+      <div class="bg-overlay"></div>
+      <div class="cloud c1"></div><div class="cloud c2"></div>
+      <div class="blob b1"></div><div class="blob b2"></div>
+      <div class="hr-line" style="bottom:248px"></div>
+      <div class="wheat-row" style="bottom:203px">
+        <svg class="wheat" style="left:0.00%;bottom:0px;animation-delay:4.58s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:1.45%;bottom:-3px;animation-delay:4.83s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:2.90%;bottom:2px;animation-delay:5.08s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:4.35%;bottom:-2px;animation-delay:5.33s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:5.80%;bottom:3px;animation-delay:5.59s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:7.25%;bottom:-1px;animation-delay:5.84s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:8.70%;bottom:1px;animation-delay:6.09s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:10.14%;bottom:0px;animation-delay:6.34s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:11.59%;bottom:-3px;animation-delay:6.59s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:13.04%;bottom:2px;animation-delay:6.85s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:14.49%;bottom:-2px;animation-delay:7.10s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:15.94%;bottom:3px;animation-delay:7.35s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:17.39%;bottom:-1px;animation-delay:7.60s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:18.84%;bottom:1px;animation-delay:7.85s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:20.29%;bottom:0px;animation-delay:8.11s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:21.74%;bottom:-3px;animation-delay:8.36s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:23.19%;bottom:2px;animation-delay:8.61s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:24.64%;bottom:-2px;animation-delay:8.86s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:26.09%;bottom:3px;animation-delay:9.12s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:27.54%;bottom:-1px;animation-delay:9.37s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:28.99%;bottom:1px;animation-delay:9.62s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:30.43%;bottom:0px;animation-delay:9.87s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:31.88%;bottom:-3px;animation-delay:10.12s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:33.33%;bottom:2px;animation-delay:10.38s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:34.78%;bottom:-2px;animation-delay:10.63s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:36.23%;bottom:3px;animation-delay:10.88s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:37.68%;bottom:-1px;animation-delay:11.13s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:39.13%;bottom:1px;animation-delay:11.38s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:40.58%;bottom:0px;animation-delay:11.64s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:42.03%;bottom:-3px;animation-delay:11.89s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:43.48%;bottom:2px;animation-delay:12.14s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:44.93%;bottom:-2px;animation-delay:12.39s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:46.38%;bottom:3px;animation-delay:12.64s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:47.83%;bottom:-1px;animation-delay:12.90s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:49.28%;bottom:1px;animation-delay:13.15s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:50.72%;bottom:0px;animation-delay:13.40s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:52.17%;bottom:-3px;animation-delay:13.65s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:53.62%;bottom:2px;animation-delay:13.90s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:55.07%;bottom:-2px;animation-delay:14.16s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:56.52%;bottom:3px;animation-delay:14.41s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:57.97%;bottom:-1px;animation-delay:14.66s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:59.42%;bottom:1px;animation-delay:14.91s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:60.87%;bottom:0px;animation-delay:15.16s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:62.32%;bottom:-3px;animation-delay:15.42s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:63.77%;bottom:2px;animation-delay:15.67s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:65.22%;bottom:-2px;animation-delay:15.92s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:66.67%;bottom:3px;animation-delay:16.17s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:68.12%;bottom:-1px;animation-delay:16.42s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:69.57%;bottom:1px;animation-delay:16.68s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:71.01%;bottom:0px;animation-delay:16.93s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:72.46%;bottom:-3px;animation-delay:17.18s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:73.91%;bottom:2px;animation-delay:17.43s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:75.36%;bottom:-2px;animation-delay:17.68s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:76.81%;bottom:3px;animation-delay:17.94s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:78.26%;bottom:-1px;animation-delay:18.19s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:79.71%;bottom:1px;animation-delay:18.44s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:81.16%;bottom:0px;animation-delay:18.69s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:82.61%;bottom:-3px;animation-delay:18.94s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:84.06%;bottom:2px;animation-delay:19.20s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:85.51%;bottom:-2px;animation-delay:19.45s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:86.96%;bottom:3px;animation-delay:19.70s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:88.41%;bottom:-1px;animation-delay:19.95s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:89.86%;bottom:1px;animation-delay:20.21s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:91.30%;bottom:0px;animation-delay:20.46s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:92.75%;bottom:-3px;animation-delay:20.71s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:94.20%;bottom:2px;animation-delay:20.96s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:95.65%;bottom:-2px;animation-delay:21.21s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:97.10%;bottom:3px;animation-delay:21.47s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:98.55%;bottom:-1px;animation-delay:21.72s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:100.00%;bottom:1px;animation-delay:21.97s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+      </div>
+      <div class="tractor-wrap">
+        <svg viewBox="0 0 280 108">
+          <circle class="dust d1" cx="18" cy="100" r="5" fill="#D9D3BC"/>
+          <circle class="dust d2" cx="86" cy="102" r="4" fill="#D9D3BC"/>
+          <line x1="24" y1="64" x2="24" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="24" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="30" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="19" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="46" y1="64" x2="46" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="46" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="52" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="41" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="68" y1="64" x2="68" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="68" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="74" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="63" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="90" y1="64" x2="90" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="90" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="96" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="85" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <path d="M28,60 C27,65 26,69 25,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M50,60 C49,65 48,69 47,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M72,60 C71,65 70,69 69,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M94,60 C93,65 92,69 91,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <rect x="10" y="58" width="98" height="6" rx="2" fill="#2C6E2E"/>
+          <rect x="16" y="28" width="86" height="32" rx="15" fill="#F2C230" stroke="#241F12" stroke-width="1"/>
+          <line x1="59" y1="30" x2="59" y2="58" stroke="#C9A227" stroke-width="1.5" opacity="0.6"/>
+          <rect x="20" y="24" width="78" height="7" rx="3.5" fill="#241F12"/>
+          <circle cx="110" cy="90" r="8" fill="#1A1A1A"/>
+          <circle cx="110" cy="90" r="8" fill="none" stroke="#F2C230" stroke-width="2"/>
+          <circle cx="110" cy="90" r="2.5" fill="#F2C230"/>
+          <line x1="102" y1="61" x2="122" y2="74" stroke="#2C6E2E" stroke-width="4" stroke-linecap="round"/>
+          <rect x="122" y="68" width="134" height="7" rx="2" fill="#14200D"/>
+          <g class="wheel-rear">
+            <circle cx="138" cy="72" r="28" fill="#14200D"/>
+            <circle cx="138" cy="72" r="28" fill="none" stroke="#C89B3C" stroke-width="4" stroke-dasharray="8 6"/>
+            <circle cx="138" cy="72" r="14" fill="#2C4020" stroke="#C89B3C" stroke-width="2"/>
+            <circle cx="138" cy="72" r="5" fill="#C89B3C"/>
+          </g>
+          <path d="M104,52 Q138,18 172,52 Q138,36 104,52 Z" fill="#20301A" stroke="#F5F1E3" stroke-width="1" stroke-opacity="0.5"/>
+          <g class="wheel-front">
+            <circle cx="248" cy="86" r="14" fill="#14200D"/>
+            <circle cx="248" cy="86" r="14" fill="none" stroke="#C89B3C" stroke-width="2.5" stroke-dasharray="5 4"/>
+            <circle cx="248" cy="86" r="4" fill="#C89B3C"/>
+          </g>
+          <path d="M172,40 Q220,28 266,52 L266,70 L172,70 Z" fill="#C89B3C" stroke="#F5F1E3" stroke-width="1.2"/>
+          <path d="M172,40 Q220,28 266,52" fill="none" stroke="#EBCB7A" stroke-width="3"/>
+          <polygon points="261,54 271,58 271,70 259,70" fill="#20301A"/>
+          <rect x="128" y="6" width="42" height="6" rx="3" fill="#2C4020"/>
+          <polygon points="132,40 132,12 166,8 180,40" fill="#C89B3C" stroke="#F5F1E3" stroke-width="1.2"/>
+          <polygon points="138,34 138,16 162,13 172,34" fill="#E9EEE2" opacity="0.88"/>
+          <circle cx="150" cy="26" r="5" fill="#14200D" opacity="0.55"/>
+          <rect x="176" y="10" width="12" height="6" rx="2" fill="#2C4020" stroke="#14200D" stroke-width="1"/>
+          <rect x="179" y="15" width="7" height="27" rx="2" fill="#14200D"/>
+          <circle class="puff p1" cx="182" cy="9" r="4" fill="#EDE7D3"/><circle class="puff p2" cx="182" cy="9" r="4" fill="#EDE7D3"/><circle class="puff p3" cx="182" cy="9" r="4" fill="#EDE7D3"/>
+        </svg>
+      </div>
+      <div class="combine-wrap">
+        <svg viewBox="0 0 220 120">
+          <g class="wheel-rear">
+            <circle cx="112" cy="86" r="22" fill="#1A1A1A"/>
+            <circle cx="112" cy="86" r="22" fill="none" stroke="#F4C51A" stroke-width="3.5" stroke-dasharray="7 5"/>
+            <circle cx="112" cy="86" r="10" fill="#D9D9D9" stroke="#1A1A1A" stroke-width="1.5"/>
+            <circle cx="112" cy="86" r="3" fill="#1A1A1A"/>
+          </g>
+          <rect x="24" y="40" width="108" height="32" rx="6" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1"/>
+          <rect x="24" y="58" width="108" height="6" fill="#12408C"/>
+          <rect x="34" y="30" width="60" height="12" rx="6" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1"/>
+          <rect x="28" y="13" width="10" height="5" rx="2" fill="#333333"/>
+          <rect x="30" y="16" width="6" height="18" rx="2" fill="#1A1A1A"/>
+          <polygon points="118,50 118,22 140,14 152,34 152,50" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1.2"/>
+          <polygon points="122,44 122,26 138,19 146,36 146,44" fill="#2A3540" opacity="0.9"/>
+          <circle cx="132" cy="32" r="4" fill="#0A0A0A" opacity="0.5"/>
+          <rect x="152" y="78" width="60" height="12" rx="2" fill="#1A1A1A"/>
+          <polygon points="212,78 220,84 212,90" fill="#1A1A1A"/>
+          <line x1="156" y1="90" x2="160" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="164" y1="90" x2="168" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="172" y1="90" x2="176" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="180" y1="90" x2="184" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="188" y1="90" x2="192" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="196" y1="90" x2="200" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="158" y1="66" x2="158" y2="78" stroke="#1A1A1A" stroke-width="2"/>
+          <line x1="206" y1="66" x2="206" y2="78" stroke="#1A1A1A" stroke-width="2"/>
+          <g class="reel-spin">
+            <line x1="158" y1="66" x2="206" y2="66" stroke="#333333" stroke-width="2.5"/>
+            <line x1="182" y1="52" x2="182" y2="80" stroke="#333333" stroke-width="2.5"/>
+            <line x1="167" y1="57" x2="197" y2="75" stroke="#333333" stroke-width="2"/>
+            <line x1="167" y1="75" x2="197" y2="57" stroke="#333333" stroke-width="2"/>
+          </g>
+          <g class="wheel-front">
+            <circle cx="34" cy="94" r="12" fill="#1A1A1A"/>
+            <circle cx="34" cy="94" r="12" fill="none" stroke="#F4C51A" stroke-width="2.5" stroke-dasharray="4 4"/>
+            <circle cx="34" cy="94" r="3.5" fill="#F4C51A"/>
+          </g>
+          <circle class="dust d1" cx="18" cy="100" r="4" fill="#D9A73B"/>
+          <circle class="dust d2" cx="10" cy="102" r="3" fill="#D9A73B"/>
+        </svg>
+      </div>
+      <div class="kicker-wrap"><span class="kicker on-dark rv rv-up d0">Seminário · Administração Rural</span></div>
+      <div class="col" style="gap:28px;flex:1;justify-content:center">
+        <h1 class="hero rv rv-pop d1">Finanças no<br>Agronegócio</h1>
+        <p class="lead rv rv-up d2" style="font-size:30px">Controle de custos, fluxo de caixa e crédito rural na gestão da propriedade rural</p>
+      </div>
+      <div class="row between end" style="border-top:1px solid rgba(245,241,227,.25);padding-top:30px">
+        <div class="col rv rv-left d3" style="gap:8px">
+          <p style="font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--gold)">Docente</p>
+          <p style="font-size:26px;color:var(--cream-text)">Dr. Raposo</p>
+        </div>
+        <div class="col rv rv-right d4" style="gap:8px;text-align:right">
+          <p style="font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--gold)">Discentes</p>
+          <p style="font-size:26px;color:var(--cream-text)">Antonio Francisco de Araújo Neto · Sammy Dourado · Davi Ferreira · Samuel Angelozy</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2: AGENDA -->
+    <section class="slide" data-index="1">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">Roteiro</span></div>
+      <h2 class="title rv rv-up d1">O que vamos abordar</h2>
+      <div class="grid-2x3" style="flex:1;margin-top:30px">
+        <div class="card rv rv-pop d2"><div class="num-badge">1</div><h3 style="margin-top:14px">Definição da função</h3><p>O que é a função financeira dentro da propriedade rural</p></div>
+        <div class="card rv rv-pop d3"><div class="num-badge">2</div><h3 style="margin-top:14px">Importância no campo</h3><p>Por que ela é decisiva no contexto rural</p></div>
+        <div class="card rv rv-pop d4"><div class="num-badge">3</div><h3 style="margin-top:14px">Principais atividades</h3><p>Custos, fluxo de caixa e crédito rural</p></div>
+        <div class="card rv rv-pop d5"><div class="num-badge">4</div><h3 style="margin-top:14px">Exemplo prático</h3><p>Aplicação em um caso real ou local</p></div>
+        <div class="card rv rv-pop d6"><div class="num-badge">5</div><h3 style="margin-top:14px">Desafios e soluções</h3><p>Riscos do campo e como enfrentá-los</p></div>
+        <div class="card dark rv rv-pop d7"><div class="num-badge" style="background:var(--gold);color:var(--green-800)">6</div><h3 style="margin-top:14px">Conclusão</h3><p>O papel das finanças no sucesso do negócio rural</p></div>
+      </div>
+      <div class="foot"><span></span><span>+ Referências ao final da apresentação</span></div>
+    </section>
+
+    <!-- 3: DEFINIÇÃO -->
+    <section class="slide" data-index="2">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">1 · Definição da função</span></div>
+      <h2 class="title rv rv-up d1">O que é a função financeira</h2>
+      <div class="row" style="gap:60px;flex:1;margin-top:20px">
+        <div class="col" style="gap:22px;width:950px">
+          <p class="lead rv rv-up d2">A função financeira é responsável pelo planejamento e controle dos recursos financeiros da propriedade rural. Ela envolve principalmente o controle de custos, o fluxo de caixa e o acesso ao crédito rural, permitindo que o produtor acompanhe suas receitas, despesas e necessidades de investimento.</p>
+          <ul style="font-size:24px;line-height:2;color:var(--ink);list-style:none;padding-left:0">
+            <li class="rv rv-left d3" style="padding-left:26px">Controle de custos</li>
+            <li class="rv rv-right d4" style="padding-left:26px">Fluxo de caixa</li>
+            <li class="rv rv-left d5" style="padding-left:26px">Acesso ao crédito rural</li>
+          </ul>
+        </div>
+        <div class="card dark rv rv-pop d6" style="width:520px;display:flex;flex-direction:column;justify-content:space-between;gap:26px">
+          <div class="icon-wrap lg pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-chart"></use></svg></div>
+          <p style="font-family:'Domine',Georgia,serif;font-size:30px;font-weight:700;line-height:1.35;color:var(--cream-text)">"Planejamento e controle dos recursos financeiros da propriedade rural."</p>
+          <p style="font-size:20px;color:var(--cream-text-soft)">Receitas, despesas e necessidades de investimento</p>
+        </div>
+      </div>
+      <div class="foot"><span></span><span>3 / 15</span></div>
+    </section>
+
+    <!-- 4: IMPORTÂNCIA -->
+    <section class="slide" data-index="3">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">2 · Importância no contexto rural</span></div>
+      <h2 class="title rv rv-up d1">Por que finanças são decisivas no campo</h2>
+      <p class="lead rv rv-up d2" style="margin-bottom:8px">No contexto rural, essa função é muito importante porque a atividade agropecuária possui custos elevados, variações de preços e períodos diferentes entre o investimento e o recebimento da produção.</p>
+      <div class="grid-3" style="margin-top:20px">
+        <div class="card rv rv-pop d3"><div class="icon-wrap pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-database"></use></svg></div><h3>Custos elevados</h3><p>A atividade agropecuária exige grande volume de investimento em terra, máquinas e insumos</p></div>
+        <div class="card rv rv-pop d4"><div class="icon-wrap pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-warning"></use></svg></div><h3>Variações de preços</h3><p>Oscilação de preços das commodities no mercado</p></div>
+        <div class="card rv rv-pop d5"><div class="icon-wrap pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-clock"></use></svg></div><h3>Investimento × recebimento</h3><p>Período diferente entre investir na safra e receber pela produção</p></div>
+      </div>
+      <div class="note-bar rv rv-up d6" style="margin-top:26px">
+        <div class="icon-wrap sm pulse-icon" style="color:var(--gold)"><svg viewBox="0 0 24 24"><use href="#icon-bulb"></use></svg></div>
+        <p>Por isso, controlar os gastos e organizar o fluxo de caixa ajuda o produtor a evitar endividamentos, planejar investimentos e identificar se a atividade está realmente gerando lucro.</p>
+      </div>
+      <div class="spacer"></div>
+      <div class="foot"><span></span><span>4 / 15</span></div>
+    </section>
+
+    <!-- 5: ATIVIDADES -->
+    <section class="slide" data-index="4">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">3 · Principais atividades</span></div>
+      <h2 class="title rv rv-up d1">As três frentes da função financeira</h2>
+      <div class="row" style="gap:26px;flex:1;margin-top:20px">
+        <div class="card dark rv rv-pop d2" style="width:33.3%;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="icon-wrap lg pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-chart"></use></svg></div>
+          <h3 style="font-size:34px;margin-top:20px">Controle de Custos</h3>
+          <p style="font-size:22px;margin-top:10px">Levantar e analisar os custos de produção para apoiar cada decisão da safra</p>
+        </div>
+        <div class="card rv rv-pop d3" style="width:33.3%;background:var(--green-600);border:none;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="icon-wrap lg pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-activity"></use></svg></div>
+          <h3 style="font-size:34px;margin-top:20px;color:var(--cream-text)">Fluxo de Caixa</h3>
+          <p style="font-size:22px;margin-top:10px;color:var(--cream-text-soft)">Organizar entradas e saídas de caixa ao longo do calendário agrícola</p>
+        </div>
+        <div class="card gold rv rv-pop d4" style="width:33.3%;display:flex;flex-direction:column;justify-content:space-between">
+          <div class="icon-wrap lg wiggle-icon" style="color:var(--green-800)"><svg viewBox="0 0 24 24"><use href="#icon-key"></use></svg></div>
+          <h3 style="font-size:34px;margin-top:20px">Crédito Rural</h3>
+          <p style="font-size:22px;margin-top:10px">Acessar e administrar linhas de financiamento agropecuário</p>
+        </div>
+      </div>
+      <p class="rv rv-up d5" style="font-size:22px;color:var(--ink-soft)">Nos próximos slides, cada atividade é detalhada com apoio das fontes oficiais — Conab e Banco Central.</p>
+      <div class="foot"><span></span><span>5 / 15</span></div>
+    </section>
+
+    <!-- 6: CUSTOS -->
+    <section class="slide" data-index="5">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">3.1 · Controle de custos</span></div>
+      <h2 class="title rv rv-up d1">Custos de produção segundo a Conab</h2>
+      <p class="lead rv rv-up d2" style="margin-bottom:26px">A Conab acompanha custos agropecuários desde 1976, com metodologia padronizada e planilhas por cultura, região e sistema de produção, atualizadas periodicamente.</p>
+      <div style="border-radius:14px;overflow:hidden">
+        <table class="tbl">
+          <tr><th style="width:26%">Tipo de custo</th><th style="width:74%">O que inclui</th></tr>
+          <tr class="rv rv-row d3"><td style="font-weight:700;color:var(--green-800)">Custo fixo</td><td>Depreciação de máquinas e benfeitorias · custo de oportunidade da terra · mão de obra permanente</td></tr>
+          <tr class="rv rv-row d4"><td style="font-weight:700;color:var(--green-800)">Custo variável</td><td>Sementes e mudas · fertilizantes e defensivos · combustível · mão de obra temporária</td></tr>
+        </table>
+      </div>
+      <div class="spacer"></div>
+      <div class="note-bar rv rv-up d5">
+        <div class="icon-wrap sm pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-chart"></use></svg></div>
+        <p>Uso no seminário: apoiar a decisão sobre o que plantar, quando vender e o planejamento financeiro da safra.</p>
+      </div>
+      <div class="foot"><span></span><span>6 / 15</span></div>
+    </section>
+
+    <!-- 7: FLUXO DE CAIXA -->
+    <section class="slide" data-index="6">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">3.2 · Fluxo de caixa</span></div>
+      <h2 class="title rv rv-up d1">Entradas e saídas ao longo do ano agrícola</h2>
+      <p class="lead rv rv-up d2" style="margin-bottom:10px">É o registro das entradas e saídas de caixa da propriedade ao longo do tempo. Na agropecuária, a receita se concentra na colheita, enquanto as despesas ocorrem o ano inteiro.</p>
+      <div class="row center between" style="flex:1">
+        <div class="card rv rv-pop d3" style="width:23%;text-align:left">
+          <div class="icon-wrap"><svg viewBox="0 0 24 24"><use href="#icon-home"></use></svg></div>
+          <h3 style="font-size:22px">Preparo e plantio</h3><p style="font-size:18px">Saída de caixa: insumos, sementes, mão de obra</p>
+        </div>
+        <div class="rv rv-pop d3"><span class="icon-wrap sm flow-x" style="color:var(--gold)"><svg viewBox="0 0 24 24"><use href="#icon-arrow"></use></svg></span></div>
+        <div class="card rv rv-pop d4" style="width:23%;text-align:left">
+          <div class="icon-wrap"><svg viewBox="0 0 24 24"><use href="#icon-wrench"></use></svg></div>
+          <h3 style="font-size:22px">Tratos culturais</h3><p style="font-size:18px">Saída de caixa: defensivos, adubação, manutenção</p>
+        </div>
+        <div class="rv rv-pop d4"><span class="icon-wrap sm flow-x" style="color:var(--gold)"><svg viewBox="0 0 24 24"><use href="#icon-arrow"></use></svg></span></div>
+        <div class="card photo rv rv-pop d5" style="width:23%;text-align:left;background-image:linear-gradient(165deg, rgba(27,40,20,.85), rgba(44,64,32,.72)), url('assets/wheat-harvest.jpg');background-size:cover;background-position:center">
+          <div class="icon-wrap pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-chart"></use></svg></div>
+          <h3 style="font-size:22px">Colheita</h3><p style="font-size:18px">Pico de entrada: venda da produção</p>
+        </div>
+        <div class="rv rv-pop d5"><span class="icon-wrap sm flow-x" style="color:var(--gold)"><svg viewBox="0 0 24 24"><use href="#icon-arrow"></use></svg></span></div>
+        <div class="card dark rv rv-pop d6" style="width:23%;text-align:left">
+          <div class="icon-wrap spin-slower"><svg viewBox="0 0 24 24"><use href="#icon-globe"></use></svg></div>
+          <h3 style="font-size:22px">Comercialização</h3><p style="font-size:18px">Entrada continuada: negociação e armazenagem</p>
+        </div>
+      </div>
+      <div class="rv rv-up d7" style="margin:10px 0 18px">
+        <div class="flow-track"><div class="dot"></div></div>
+      </div>
+      <div class="row center rv rv-up d8" style="gap:18px">
+        <div class="icon-wrap sm" style="color:var(--green-600)"><svg viewBox="0 0 24 24"><use href="#icon-check"></use></svg></div>
+        <p style="font-size:21px;color:var(--ink-soft)">Boa prática: comparar o fluxo de caixa projetado (orçado) com o realizado, revisando mensalmente.</p>
+      </div>
+      <div class="foot"><span></span><span>7 / 15</span></div>
+    </section>
+
+    <!-- 8: CRÉDITO RURAL 1 -->
+    <section class="slide" data-index="7">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">3.3 · Crédito rural</span></div>
+      <h2 class="title rv rv-up d1">Modalidades e finalidades do crédito rural</h2>
+      <p class="source-tag rv rv-up d1" style="margin-bottom:20px">Fonte: Banco Central do Brasil — Crédito Rural</p>
+      <div class="grid-2">
+        <div class="card rv rv-pop d2"><div class="row center" style="gap:14px;margin-bottom:8px"><div class="icon-wrap sm pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-activity"></use></svg></div><h3 style="margin:0">Custeio</h3></div><p>Cobre as despesas normais do ciclo produtivo: insumos, mão de obra e tratos culturais</p></div>
+        <div class="card rv rv-pop d3"><div class="row center" style="gap:14px;margin-bottom:8px"><div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-wrench"></use></svg></div><h3 style="margin:0">Investimento</h3></div><p>Amplia a capacidade produtiva: máquinas, equipamentos, armazenagem e infraestrutura</p></div>
+      </div>
+      <div class="grid-2" style="margin-top:26px">
+        <div class="card rv rv-pop d4"><div class="row center" style="gap:14px;margin-bottom:8px"><div class="icon-wrap sm spin-slower"><svg viewBox="0 0 24 24"><use href="#icon-globe"></use></svg></div><h3 style="margin:0">Comercialização</h3></div><p>Viabiliza a venda da produção, sem obrigar o produtor a vender já na colheita</p></div>
+        <div class="card rv rv-pop d5"><div class="row center" style="gap:14px;margin-bottom:8px"><div class="icon-wrap sm spin-slow"><svg viewBox="0 0 24 24"><use href="#icon-settings"></use></svg></div><h3 style="margin:0">Industrialização</h3></div><p>Financia o processamento de produtos agropecuários por produtores e cooperativas</p></div>
+      </div>
+      <div class="spacer"></div>
+      <div class="note-bar rv rv-up d6">
+        <div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-shield"></use></svg></div>
+        <p>Os recursos podem ser controlados (exigibilidade bancária, poupança rural) ou livres, conforme o Manual de Crédito Rural do Banco Central.</p>
+      </div>
+      <div class="foot"><span></span><span>8 / 15</span></div>
+    </section>
+
+    <!-- 9: CRÉDITO RURAL 2 -->
+    <section class="slide" data-index="8">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">3.3 · Crédito rural</span></div>
+      <h2 class="title rv rv-up d1">Quem acessa, Pronaf e proteção contra perdas</h2>
+      <p class="source-tag rv rv-up d1" style="margin-bottom:18px">Fonte: Banco Central — FAQ Crédito Rural e Manual de Crédito Rural (MCR)</p>
+      <p class="lead rv rv-up d2" style="margin-bottom:22px">Podem acessar o crédito rural produtores pessoa física ou jurídica, cooperativas e associações, classificados conforme porte e enquadramento, segundo o MCR.</p>
+      <div class="grid-2" style="flex:1">
+        <div class="card dark rv rv-left d3" style="display:flex;flex-direction:column;justify-content:center">
+          <div class="icon-wrap"><svg viewBox="0 0 24 24"><use href="#icon-users"></use></svg></div>
+          <h3 style="font-size:30px">Pronaf</h3>
+          <p style="font-size:22px">Linha voltada à agricultura familiar, com juros menores e prazos adequados à pequena propriedade</p>
+        </div>
+        <div class="card rv rv-right d4" style="background:var(--green-600);border:none;display:flex;flex-direction:column;justify-content:center">
+          <div class="icon-wrap"><svg viewBox="0 0 24 24"><use href="#icon-lock"></use></svg></div>
+          <h3 style="font-size:30px;color:var(--cream-text)">Proagro</h3>
+          <p style="font-size:22px;color:var(--cream-text-soft)">Protege o produtor de perdas por eventos naturais adversos, garantindo a quitação do custeio em caso de sinistro</p>
+        </div>
+      </div>
+      <div class="row center rv rv-up d5" style="gap:18px">
+        <div class="icon-wrap sm" style="color:var(--green-600)"><svg viewBox="0 0 24 24"><use href="#icon-badge"></use></svg></div>
+        <p style="font-size:21px;color:var(--ink-soft)">O Manual de Crédito Rural (MCR) é a norma oficial do Banco Central: detalha beneficiários, classificação dos produtores e regras das operações.</p>
+      </div>
+      <div class="foot"><span></span><span>9 / 15</span></div>
+    </section>
+
+    <!-- 10: EXEMPLO -->
+    <section class="slide" data-index="9">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">4 · Exemplo prático</span></div>
+      <h2 class="title rv rv-up d1">Produção de milho — 1 hectare</h2>
+      <p class="lead rv rv-up d2" style="margin-bottom:22px">Um produtor decide plantar 1 hectare de milho e organiza as três frentes financeiras da safra:</p>
+      <div class="grid-3">
+        <div class="card rv rv-pop d3" style="display:flex;flex-direction:column;gap:14px">
+          <div class="row center" style="gap:12px"><div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-chart"></use></svg></div><h3 style="margin:0">Controle de custos</h3></div>
+          <div class="col" style="gap:5px">
+            <div class="row between"><p style="font-size:19px;color:var(--ink-soft)">Sementes</p><p style="font-size:19px;color:var(--ink)">R$ 800</p></div>
+            <div class="row between"><p style="font-size:19px;color:var(--ink-soft)">Adubo</p><p style="font-size:19px;color:var(--ink)">R$ 1.500</p></div>
+            <div class="row between"><p style="font-size:19px;color:var(--ink-soft)">Defensivos</p><p style="font-size:19px;color:var(--ink)">R$ 600</p></div>
+            <div class="row between"><p style="font-size:19px;color:var(--ink-soft)">Combustível</p><p style="font-size:19px;color:var(--ink)">R$ 400</p></div>
+            <div class="row between"><p style="font-size:19px;color:var(--ink-soft)">Mão de obra</p><p style="font-size:19px;color:var(--ink)">R$ 700</p></div>
+            <div class="divider"></div>
+            <div class="row between"><p style="font-size:21px;font-weight:800;color:var(--green-800)">Custo total</p><p style="font-size:21px;font-weight:800;color:var(--green-800)">R$ 4.000</p></div>
+          </div>
+          <p style="font-size:16px;line-height:1.4;color:var(--ink-faint)">Mostra quanto ele realmente gastou para produzir.</p>
+        </div>
+        <div class="card rv rv-pop d4" style="display:flex;flex-direction:column;gap:14px">
+          <div class="row center" style="gap:12px"><div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-activity"></use></svg></div><h3 style="margin:0">Fluxo de caixa</h3></div>
+          <div class="col" style="gap:5px">
+            <div class="row between"><p style="font-size:19px;color:var(--ink-soft)">Entradas — venda do milho</p><p style="font-size:19px;font-weight:700;color:#2E6B3E">R$ 6.500</p></div>
+            <div class="row between"><p style="font-size:19px;color:var(--ink-soft)">Saídas — custos da produção</p><p style="font-size:19px;font-weight:700;color:#B3452F">R$ 4.000</p></div>
+            <div class="divider"></div>
+            <div class="row between"><p style="font-size:21px;font-weight:800;color:var(--green-800)">Saldo</p><p style="font-size:21px;font-weight:800;color:var(--green-800)">R$ 2.500</p></div>
+          </div>
+          <p style="font-size:16px;line-height:1.4;color:var(--ink-faint)">Mostra se haverá dinheiro disponível para as próximas despesas.</p>
+        </div>
+        <div class="card dark rv rv-pop d5" style="display:flex;flex-direction:column;gap:14px;justify-content:space-between">
+          <div class="row center" style="gap:12px"><div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-key"></use></svg></div><h3 style="margin:0">Crédito rural</h3></div>
+          <p style="font-size:19px;line-height:1.55">Se o produtor não tiver os R$ 4.000 necessários para iniciar a lavoura, pode buscar crédito rural para financiar parte dos custos, pagando o financiamento conforme as condições do programa/banco.</p>
+        </div>
+      </div>
+      <div class="note-bar rv rv-up d6" style="margin-top:22px">
+        <div class="icon-wrap sm" style="color:var(--gold)"><svg viewBox="0 0 24 24"><use href="#icon-bulb"></use></svg></div>
+        <p>Na prática: o controle de custos mostra quanto custa produzir, o fluxo de caixa mostra quando o dinheiro entra e sai, e o crédito rural pode fornecer recursos para financiar a produção.</p>
+      </div>
+      <div class="spacer"></div>
+      <div class="foot"><span></span><span>10 / 15</span></div>
+    </section>
+
+    <!-- 11: DESAFIOS -->
+    <section class="slide" data-index="10">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">5 · Desafios e soluções</span></div>
+      <h2 class="title rv rv-up d1">Riscos do campo e como enfrentá-los</h2>
+      <div class="row between rv rv-up d2" style="margin:18px 0">
+        <div class="row center" style="gap:14px;width:50%"><div class="icon-wrap sm pulse-icon" style="color:#9A5A2E"><svg viewBox="0 0 24 24"><use href="#icon-warning"></use></svg></div><p style="font-size:28px;font-weight:700;color:var(--green-800)">Desafios</p></div>
+        <div class="row center" style="gap:14px;width:50%"><div class="icon-wrap sm" style="color:var(--green-600)"><svg viewBox="0 0 24 24"><use href="#icon-check"></use></svg></div><p style="font-size:28px;font-weight:700;color:var(--green-800)">Soluções</p></div>
+      </div>
+      <div style="border-radius:14px;overflow:hidden">
+        <table class="tbl">
+          <tr class="rv rv-row d3"><td style="width:50%">Alta volatilidade de preços agrícolas</td><td style="width:50%">Planejamento financeiro e orçamento de safra, com apoio das planilhas da Conab</td></tr>
+          <tr class="rv rv-row d4"><td>Riscos climáticos — seca, geada, excesso de chuva</td><td>Contratação de seguro rural e adesão ao Proagro</td></tr>
+          <tr class="rv rv-row d5"><td>Acesso limitado ao crédito para pequenos produtores</td><td>Uso do Pronaf e de outras linhas de crédito rural</td></tr>
+          <tr class="rv rv-row d6"><td>Falta de controle formal de custos e caixa</td><td>Planilhas e sistemas de controle de custos e fluxo de caixa</td></tr>
+          <tr class="rv rv-row d7"><td>Sazonalidade da receita</td><td>Diversificação de atividades e comercialização planejada</td></tr>
+        </table>
+      </div>
+      <div class="foot"><span></span><span>11 / 15</span></div>
+    </section>
+
+    <!-- 12: CONCLUSÃO -->
+    <section class="slide dark" data-index="11">
+      <div class="kicker-wrap"><span class="kicker on-dark rv rv-up d0">6 · Conclusão</span></div>
+      <h2 class="title rv rv-up d1">O papel das finanças no sucesso do negócio rural</h2>
+      <div class="row" style="gap:60px;flex:1;margin-top:24px">
+        <ul style="font-size:26px;line-height:2.1;color:var(--cream-2);width:920px;list-style:none;padding-left:0">
+          <li class="rv rv-left d2">Transforma dados de custos em decisões melhores</li>
+          <li class="rv rv-right d3">Garante liquidez para operar durante todo o ciclo produtivo</li>
+          <li class="rv rv-left d4">Viabiliza investimento e crescimento por meio do crédito adequado</li>
+          <li class="rv rv-right d5">Reduz a exposição a riscos diante das incertezas do campo</li>
+          <li class="rv rv-left d6">É a base da sustentabilidade econômica do negócio rural</li>
+        </ul>
+        <div class="rv rv-pop d7" style="width:520px;background:rgba(255,255,255,.08);border:1px solid rgba(245,241,227,.2);border-radius:24px;padding:44px;display:flex;flex-direction:column;justify-content:space-between;gap:26px">
+          <div class="icon-wrap lg pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-shield"></use></svg></div>
+          <p style="font-family:'Domine',Georgia,serif;font-size:32px;font-weight:700;line-height:1.35;color:var(--cream-text)">"Sem controle financeiro, não há gestão rural sustentável."</p>
+        </div>
+      </div>
+      <div class="foot"><span></span><span>12 / 15</span></div>
+    </section>
+
+    <!-- 13: REFERÊNCIAS -->
+    <section class="slide" data-index="12">
+      <div class="kicker-wrap"><span class="kicker rv rv-up d0">Referências</span></div>
+      <h2 class="title rv rv-up d1">Fontes consultadas</h2>
+      <div class="col" style="margin-top:10px">
+        <div class="row rv rv-left d2" style="gap:22px;padding:18px 0"><div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-book"></use></svg></div>
+          <div class="col" style="gap:6px"><p style="font-size:24px;font-weight:700;color:var(--green-800)">CONAB — Custos de Produção</p><p style="font-size:20px;line-height:1.4;color:var(--ink-soft)">Companhia Nacional de Abastecimento. Levantamento de custos agropecuários desde 1976, com metodologias e planilhas por cultura. Disponível em: www.conab.gov.br.</p></div></div>
+        <div class="divider"></div>
+        <div class="row rv rv-right d3" style="gap:22px;padding:18px 0"><div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-link"></use></svg></div>
+          <div class="col" style="gap:6px"><p style="font-size:24px;font-weight:700;color:var(--green-800)">Banco Central do Brasil — Crédito Rural</p><p style="font-size:20px;line-height:1.4;color:var(--ink-soft)">Modalidades, finalidades e principais fontes de recursos do crédito rural. Disponível em: www.bcb.gov.br.</p></div></div>
+        <div class="divider"></div>
+        <div class="row rv rv-left d4" style="gap:22px;padding:18px 0"><div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-bulb"></use></svg></div>
+          <div class="col" style="gap:6px"><p style="font-size:24px;font-weight:700;color:var(--green-800)">Banco Central do Brasil — FAQ Crédito Rural</p><p style="font-size:20px;line-height:1.4;color:var(--ink-soft)">O que é, quem pode acessar, objetivos, custeio, investimento, Pronaf e Proagro. Atualizada em agosto de 2026. Disponível em: www.bcb.gov.br.</p></div></div>
+        <div class="divider"></div>
+        <div class="row rv rv-right d5" style="gap:22px;padding:18px 0"><div class="icon-wrap sm"><svg viewBox="0 0 24 24"><use href="#icon-badge"></use></svg></div>
+          <div class="col" style="gap:6px"><p style="font-size:24px;font-weight:700;color:var(--green-800)">Banco Central do Brasil — Manual de Crédito Rural (MCR)</p><p style="font-size:20px;line-height:1.4;color:var(--ink-soft)">Norma oficial: beneficiários, classificação dos produtores e regras das operações de crédito rural. Disponível em: www3.bcb.gov.br/mcr.</p></div></div>
+      </div>
+      <div class="foot"><span>Acesso em: setembro de 2026</span><span>13 / 15</span></div>
+    </section>
+
+    <!-- 14: VÍDEO -->
+    <section class="slide dark" data-index="13">
+      <div class="blob b1"></div><div class="blob b2"></div>
+      <div class="wheat-row" style="bottom:203px">
+        <svg class="wheat" style="left:0.00%;bottom:0px;animation-delay:4.58s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:1.45%;bottom:-3px;animation-delay:4.83s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:2.90%;bottom:2px;animation-delay:5.08s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:4.35%;bottom:-2px;animation-delay:5.33s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:5.80%;bottom:3px;animation-delay:5.59s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:7.25%;bottom:-1px;animation-delay:5.84s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:8.70%;bottom:1px;animation-delay:6.09s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:10.14%;bottom:0px;animation-delay:6.34s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:11.59%;bottom:-3px;animation-delay:6.59s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:13.04%;bottom:2px;animation-delay:6.85s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:14.49%;bottom:-2px;animation-delay:7.10s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:15.94%;bottom:3px;animation-delay:7.35s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:17.39%;bottom:-1px;animation-delay:7.60s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:18.84%;bottom:1px;animation-delay:7.85s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:20.29%;bottom:0px;animation-delay:8.11s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:21.74%;bottom:-3px;animation-delay:8.36s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:23.19%;bottom:2px;animation-delay:8.61s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:24.64%;bottom:-2px;animation-delay:8.86s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:26.09%;bottom:3px;animation-delay:9.12s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:27.54%;bottom:-1px;animation-delay:9.37s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:28.99%;bottom:1px;animation-delay:9.62s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:30.43%;bottom:0px;animation-delay:9.87s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:31.88%;bottom:-3px;animation-delay:10.12s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:33.33%;bottom:2px;animation-delay:10.38s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:34.78%;bottom:-2px;animation-delay:10.63s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:36.23%;bottom:3px;animation-delay:10.88s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:37.68%;bottom:-1px;animation-delay:11.13s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:39.13%;bottom:1px;animation-delay:11.38s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:40.58%;bottom:0px;animation-delay:11.64s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:42.03%;bottom:-3px;animation-delay:11.89s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:43.48%;bottom:2px;animation-delay:12.14s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:44.93%;bottom:-2px;animation-delay:12.39s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:46.38%;bottom:3px;animation-delay:12.64s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:47.83%;bottom:-1px;animation-delay:12.90s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:49.28%;bottom:1px;animation-delay:13.15s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:50.72%;bottom:0px;animation-delay:13.40s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:52.17%;bottom:-3px;animation-delay:13.65s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:53.62%;bottom:2px;animation-delay:13.90s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:55.07%;bottom:-2px;animation-delay:14.16s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:56.52%;bottom:3px;animation-delay:14.41s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:57.97%;bottom:-1px;animation-delay:14.66s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:59.42%;bottom:1px;animation-delay:14.91s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:60.87%;bottom:0px;animation-delay:15.16s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:62.32%;bottom:-3px;animation-delay:15.42s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:63.77%;bottom:2px;animation-delay:15.67s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:65.22%;bottom:-2px;animation-delay:15.92s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:66.67%;bottom:3px;animation-delay:16.17s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:68.12%;bottom:-1px;animation-delay:16.42s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:69.57%;bottom:1px;animation-delay:16.68s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:71.01%;bottom:0px;animation-delay:16.93s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:72.46%;bottom:-3px;animation-delay:17.18s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:73.91%;bottom:2px;animation-delay:17.43s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:75.36%;bottom:-2px;animation-delay:17.68s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:76.81%;bottom:3px;animation-delay:17.94s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:78.26%;bottom:-1px;animation-delay:18.19s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:79.71%;bottom:1px;animation-delay:18.44s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:81.16%;bottom:0px;animation-delay:18.69s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:82.61%;bottom:-3px;animation-delay:18.94s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:84.06%;bottom:2px;animation-delay:19.20s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:85.51%;bottom:-2px;animation-delay:19.45s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:86.96%;bottom:3px;animation-delay:19.70s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:88.41%;bottom:-1px;animation-delay:19.95s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:89.86%;bottom:1px;animation-delay:20.21s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:91.30%;bottom:0px;animation-delay:20.46s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:92.75%;bottom:-3px;animation-delay:20.71s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:94.20%;bottom:2px;animation-delay:20.96s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:95.65%;bottom:-2px;animation-delay:21.21s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:97.10%;bottom:3px;animation-delay:21.47s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:98.55%;bottom:-1px;animation-delay:21.72s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:100.00%;bottom:1px;animation-delay:21.97s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+      </div>
+      <div class="tractor-wrap">
+        <svg viewBox="0 0 280 108">
+          <circle class="dust d1" cx="18" cy="100" r="5" fill="#D9D3BC"/>
+          <circle class="dust d2" cx="86" cy="102" r="4" fill="#D9D3BC"/>
+          <line x1="24" y1="64" x2="24" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="24" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="30" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="19" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="46" y1="64" x2="46" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="46" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="52" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="41" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="68" y1="64" x2="68" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="68" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="74" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="63" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="90" y1="64" x2="90" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="90" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="96" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="85" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <path d="M28,60 C27,65 26,69 25,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M50,60 C49,65 48,69 47,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M72,60 C71,65 70,69 69,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M94,60 C93,65 92,69 91,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <rect x="10" y="58" width="98" height="6" rx="2" fill="#2C6E2E"/>
+          <rect x="16" y="28" width="86" height="32" rx="15" fill="#F2C230" stroke="#241F12" stroke-width="1"/>
+          <line x1="59" y1="30" x2="59" y2="58" stroke="#C9A227" stroke-width="1.5" opacity="0.6"/>
+          <rect x="20" y="24" width="78" height="7" rx="3.5" fill="#241F12"/>
+          <circle cx="110" cy="90" r="8" fill="#1A1A1A"/>
+          <circle cx="110" cy="90" r="8" fill="none" stroke="#F2C230" stroke-width="2"/>
+          <circle cx="110" cy="90" r="2.5" fill="#F2C230"/>
+          <line x1="102" y1="61" x2="122" y2="74" stroke="#2C6E2E" stroke-width="4" stroke-linecap="round"/>
+          <rect x="122" y="68" width="134" height="7" rx="2" fill="#14200D"/>
+          <g class="wheel-rear">
+            <circle cx="138" cy="72" r="28" fill="#14200D"/>
+            <circle cx="138" cy="72" r="28" fill="none" stroke="#C89B3C" stroke-width="4" stroke-dasharray="8 6"/>
+            <circle cx="138" cy="72" r="14" fill="#2C4020" stroke="#C89B3C" stroke-width="2"/>
+            <circle cx="138" cy="72" r="5" fill="#C89B3C"/>
+          </g>
+          <path d="M104,52 Q138,18 172,52 Q138,36 104,52 Z" fill="#20301A" stroke="#F5F1E3" stroke-width="1" stroke-opacity="0.5"/>
+          <g class="wheel-front">
+            <circle cx="248" cy="86" r="14" fill="#14200D"/>
+            <circle cx="248" cy="86" r="14" fill="none" stroke="#C89B3C" stroke-width="2.5" stroke-dasharray="5 4"/>
+            <circle cx="248" cy="86" r="4" fill="#C89B3C"/>
+          </g>
+          <path d="M172,40 Q220,28 266,52 L266,70 L172,70 Z" fill="#C89B3C" stroke="#F5F1E3" stroke-width="1.2"/>
+          <path d="M172,40 Q220,28 266,52" fill="none" stroke="#EBCB7A" stroke-width="3"/>
+          <polygon points="261,54 271,58 271,70 259,70" fill="#20301A"/>
+          <rect x="128" y="6" width="42" height="6" rx="3" fill="#2C4020"/>
+          <polygon points="132,40 132,12 166,8 180,40" fill="#C89B3C" stroke="#F5F1E3" stroke-width="1.2"/>
+          <polygon points="138,34 138,16 162,13 172,34" fill="#E9EEE2" opacity="0.88"/>
+          <circle cx="150" cy="26" r="5" fill="#14200D" opacity="0.55"/>
+          <rect x="176" y="10" width="12" height="6" rx="2" fill="#2C4020" stroke="#14200D" stroke-width="1"/>
+          <rect x="179" y="15" width="7" height="27" rx="2" fill="#14200D"/>
+          <circle class="puff p1" cx="182" cy="9" r="4" fill="#EDE7D3"/><circle class="puff p2" cx="182" cy="9" r="4" fill="#EDE7D3"/><circle class="puff p3" cx="182" cy="9" r="4" fill="#EDE7D3"/>
+        </svg>
+      </div>
+      <div class="combine-wrap">
+        <svg viewBox="0 0 220 120">
+          <g class="wheel-rear">
+            <circle cx="112" cy="86" r="22" fill="#1A1A1A"/>
+            <circle cx="112" cy="86" r="22" fill="none" stroke="#F4C51A" stroke-width="3.5" stroke-dasharray="7 5"/>
+            <circle cx="112" cy="86" r="10" fill="#D9D9D9" stroke="#1A1A1A" stroke-width="1.5"/>
+            <circle cx="112" cy="86" r="3" fill="#1A1A1A"/>
+          </g>
+          <rect x="24" y="40" width="108" height="32" rx="6" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1"/>
+          <rect x="24" y="58" width="108" height="6" fill="#12408C"/>
+          <rect x="34" y="30" width="60" height="12" rx="6" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1"/>
+          <rect x="28" y="13" width="10" height="5" rx="2" fill="#333333"/>
+          <rect x="30" y="16" width="6" height="18" rx="2" fill="#1A1A1A"/>
+          <polygon points="118,50 118,22 140,14 152,34 152,50" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1.2"/>
+          <polygon points="122,44 122,26 138,19 146,36 146,44" fill="#2A3540" opacity="0.9"/>
+          <circle cx="132" cy="32" r="4" fill="#0A0A0A" opacity="0.5"/>
+          <rect x="152" y="78" width="60" height="12" rx="2" fill="#1A1A1A"/>
+          <polygon points="212,78 220,84 212,90" fill="#1A1A1A"/>
+          <line x1="156" y1="90" x2="160" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="164" y1="90" x2="168" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="172" y1="90" x2="176" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="180" y1="90" x2="184" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="188" y1="90" x2="192" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="196" y1="90" x2="200" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="158" y1="66" x2="158" y2="78" stroke="#1A1A1A" stroke-width="2"/>
+          <line x1="206" y1="66" x2="206" y2="78" stroke="#1A1A1A" stroke-width="2"/>
+          <g class="reel-spin">
+            <line x1="158" y1="66" x2="206" y2="66" stroke="#333333" stroke-width="2.5"/>
+            <line x1="182" y1="52" x2="182" y2="80" stroke="#333333" stroke-width="2.5"/>
+            <line x1="167" y1="57" x2="197" y2="75" stroke="#333333" stroke-width="2"/>
+            <line x1="167" y1="75" x2="197" y2="57" stroke="#333333" stroke-width="2"/>
+          </g>
+          <g class="wheel-front">
+            <circle cx="34" cy="94" r="12" fill="#1A1A1A"/>
+            <circle cx="34" cy="94" r="12" fill="none" stroke="#F4C51A" stroke-width="2.5" stroke-dasharray="4 4"/>
+            <circle cx="34" cy="94" r="3.5" fill="#F4C51A"/>
+          </g>
+          <circle class="dust d1" cx="18" cy="100" r="4" fill="#D9A73B"/>
+          <circle class="dust d2" cx="10" cy="102" r="3" fill="#D9A73B"/>
+        </svg>
+      </div>
+      <div class="kicker-wrap"><span class="kicker on-dark rv rv-up d0">Bônus</span></div>
+      <div class="row" style="flex:1;justify-content:center;align-items:center">
+        <video class="rv rv-pop d2" controls preload="metadata" style="position:relative;z-index:3;max-height:820px;max-width:461px;border-radius:20px;border:2px solid rgba(245,241,227,.25);box-shadow:0 30px 80px rgba(0,0,0,.5);background:#000">
+          <source src="assets/encerramento-video.mp4" type="video/mp4">
+          Seu navegador não suporta vídeo embutido.
+        </video>
+      </div>
+      <div class="foot"><span></span><span>14 / 15</span></div>
+    </section>
+
+    <!-- 15: ENCERRAMENTO -->
+    <section class="slide dark" data-index="14">
+      <img class="bg-photo" src="assets/wheat-harvest.jpg" alt="">
+      <div class="bg-overlay"></div>
+      <div class="cloud c1"></div><div class="cloud c2"></div>
+      <div class="blob b3"></div><div class="blob b4"></div>
+      <div class="wheat-row" style="bottom:189px">
+        <svg class="wheat" style="left:0.00%;bottom:0px;animation-delay:4.58s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:1.45%;bottom:-3px;animation-delay:4.83s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:2.90%;bottom:2px;animation-delay:5.08s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:4.35%;bottom:-2px;animation-delay:5.33s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:5.80%;bottom:3px;animation-delay:5.59s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:7.25%;bottom:-1px;animation-delay:5.84s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:8.70%;bottom:1px;animation-delay:6.09s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:10.14%;bottom:0px;animation-delay:6.34s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:11.59%;bottom:-3px;animation-delay:6.59s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:13.04%;bottom:2px;animation-delay:6.85s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:14.49%;bottom:-2px;animation-delay:7.10s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:15.94%;bottom:3px;animation-delay:7.35s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:17.39%;bottom:-1px;animation-delay:7.60s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:18.84%;bottom:1px;animation-delay:7.85s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:20.29%;bottom:0px;animation-delay:8.11s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:21.74%;bottom:-3px;animation-delay:8.36s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:23.19%;bottom:2px;animation-delay:8.61s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:24.64%;bottom:-2px;animation-delay:8.86s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:26.09%;bottom:3px;animation-delay:9.12s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:27.54%;bottom:-1px;animation-delay:9.37s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:28.99%;bottom:1px;animation-delay:9.62s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:30.43%;bottom:0px;animation-delay:9.87s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:31.88%;bottom:-3px;animation-delay:10.12s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:33.33%;bottom:2px;animation-delay:10.38s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:34.78%;bottom:-2px;animation-delay:10.63s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:36.23%;bottom:3px;animation-delay:10.88s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:37.68%;bottom:-1px;animation-delay:11.13s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:39.13%;bottom:1px;animation-delay:11.38s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:40.58%;bottom:0px;animation-delay:11.64s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:42.03%;bottom:-3px;animation-delay:11.89s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:43.48%;bottom:2px;animation-delay:12.14s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:44.93%;bottom:-2px;animation-delay:12.39s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:46.38%;bottom:3px;animation-delay:12.64s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:47.83%;bottom:-1px;animation-delay:12.90s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:49.28%;bottom:1px;animation-delay:13.15s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:50.72%;bottom:0px;animation-delay:13.40s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:52.17%;bottom:-3px;animation-delay:13.65s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:53.62%;bottom:2px;animation-delay:13.90s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:55.07%;bottom:-2px;animation-delay:14.16s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:56.52%;bottom:3px;animation-delay:14.41s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:57.97%;bottom:-1px;animation-delay:14.66s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:59.42%;bottom:1px;animation-delay:14.91s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:60.87%;bottom:0px;animation-delay:15.16s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:62.32%;bottom:-3px;animation-delay:15.42s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:63.77%;bottom:2px;animation-delay:15.67s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:65.22%;bottom:-2px;animation-delay:15.92s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:66.67%;bottom:3px;animation-delay:16.17s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:68.12%;bottom:-1px;animation-delay:16.42s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:69.57%;bottom:1px;animation-delay:16.68s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:71.01%;bottom:0px;animation-delay:16.93s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:72.46%;bottom:-3px;animation-delay:17.18s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:73.91%;bottom:2px;animation-delay:17.43s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:75.36%;bottom:-2px;animation-delay:17.68s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:76.81%;bottom:3px;animation-delay:17.94s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:78.26%;bottom:-1px;animation-delay:18.19s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:79.71%;bottom:1px;animation-delay:18.44s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:81.16%;bottom:0px;animation-delay:18.69s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:82.61%;bottom:-3px;animation-delay:18.94s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:84.06%;bottom:2px;animation-delay:19.20s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:85.51%;bottom:-2px;animation-delay:19.45s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:86.96%;bottom:3px;animation-delay:19.70s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:88.41%;bottom:-1px;animation-delay:19.95s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:89.86%;bottom:1px;animation-delay:20.21s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:91.30%;bottom:0px;animation-delay:20.46s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:92.75%;bottom:-3px;animation-delay:20.71s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:94.20%;bottom:2px;animation-delay:20.96s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:95.65%;bottom:-2px;animation-delay:21.21s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:97.10%;bottom:3px;animation-delay:21.47s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:98.55%;bottom:-1px;animation-delay:21.72s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+        <svg class="wheat" style="left:100.00%;bottom:1px;animation-delay:21.97s" viewBox="0 0 14 26"><line x1="3" y1="26" x2="4" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><line x1="7" y1="26" x2="7" y2="4" stroke="#7A6A2E" stroke-width="1.3"/><line x1="11" y1="26" x2="10" y2="6" stroke="#7A6A2E" stroke-width="1.3"/><ellipse cx="4" cy="5" rx="1.8" ry="4" fill="#D9A73B"/><ellipse cx="7" cy="3" rx="1.8" ry="4.5" fill="#E3B94A"/><ellipse cx="10" cy="5" rx="1.8" ry="4" fill="#D9A73B"/></svg>
+      </div>
+      <div class="tractor-wrap" style="bottom:192px">
+        <svg viewBox="0 0 280 108">
+          <circle class="dust d1" cx="18" cy="100" r="5" fill="#D9D3BC"/>
+          <circle class="dust d2" cx="86" cy="102" r="4" fill="#D9D3BC"/>
+          <line x1="24" y1="64" x2="24" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="24" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="30" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="19" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="46" y1="64" x2="46" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="46" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="52" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="41" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="68" y1="64" x2="68" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="68" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="74" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="63" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <line x1="90" y1="64" x2="90" y2="82" stroke="#2C6E2E" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="90" cy="94" r="9" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="2"/>
+          <circle cx="96" cy="99" r="4" fill="#1A1A1A" stroke="#7A4A2A" stroke-width="1.3"/>
+          <rect x="85" y="76" width="10" height="8" rx="2" fill="#F2C230" stroke="#241F12" stroke-width="0.8"/>
+          <path d="M28,60 C27,65 26,69 25,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M50,60 C49,65 48,69 47,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M72,60 C71,65 70,69 69,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <path d="M94,60 C93,65 92,69 91,74" stroke="#1A1A1A" stroke-width="2" fill="none"/>
+          <rect x="10" y="58" width="98" height="6" rx="2" fill="#2C6E2E"/>
+          <rect x="16" y="28" width="86" height="32" rx="15" fill="#F2C230" stroke="#241F12" stroke-width="1"/>
+          <line x1="59" y1="30" x2="59" y2="58" stroke="#C9A227" stroke-width="1.5" opacity="0.6"/>
+          <rect x="20" y="24" width="78" height="7" rx="3.5" fill="#241F12"/>
+          <circle cx="110" cy="90" r="8" fill="#1A1A1A"/>
+          <circle cx="110" cy="90" r="8" fill="none" stroke="#F2C230" stroke-width="2"/>
+          <circle cx="110" cy="90" r="2.5" fill="#F2C230"/>
+          <line x1="102" y1="61" x2="122" y2="74" stroke="#2C6E2E" stroke-width="4" stroke-linecap="round"/>
+          <rect x="122" y="68" width="134" height="7" rx="2" fill="#14200D"/>
+          <g class="wheel-rear">
+            <circle cx="138" cy="72" r="28" fill="#14200D"/>
+            <circle cx="138" cy="72" r="28" fill="none" stroke="#C89B3C" stroke-width="4" stroke-dasharray="8 6"/>
+            <circle cx="138" cy="72" r="14" fill="#2C4020" stroke="#C89B3C" stroke-width="2"/>
+            <circle cx="138" cy="72" r="5" fill="#C89B3C"/>
+          </g>
+          <path d="M104,52 Q138,18 172,52 Q138,36 104,52 Z" fill="#20301A" stroke="#F5F1E3" stroke-width="1" stroke-opacity="0.5"/>
+          <g class="wheel-front">
+            <circle cx="248" cy="86" r="14" fill="#14200D"/>
+            <circle cx="248" cy="86" r="14" fill="none" stroke="#C89B3C" stroke-width="2.5" stroke-dasharray="5 4"/>
+            <circle cx="248" cy="86" r="4" fill="#C89B3C"/>
+          </g>
+          <path d="M172,40 Q220,28 266,52 L266,70 L172,70 Z" fill="#C89B3C" stroke="#F5F1E3" stroke-width="1.2"/>
+          <path d="M172,40 Q220,28 266,52" fill="none" stroke="#EBCB7A" stroke-width="3"/>
+          <polygon points="261,54 271,58 271,70 259,70" fill="#20301A"/>
+          <rect x="128" y="6" width="42" height="6" rx="3" fill="#2C4020"/>
+          <polygon points="132,40 132,12 166,8 180,40" fill="#C89B3C" stroke="#F5F1E3" stroke-width="1.2"/>
+          <polygon points="138,34 138,16 162,13 172,34" fill="#E9EEE2" opacity="0.88"/>
+          <circle cx="150" cy="26" r="5" fill="#14200D" opacity="0.55"/>
+          <rect x="176" y="10" width="12" height="6" rx="2" fill="#2C4020" stroke="#14200D" stroke-width="1"/>
+          <rect x="179" y="15" width="7" height="27" rx="2" fill="#14200D"/>
+          <circle class="puff p1" cx="182" cy="9" r="4" fill="#EDE7D3"/><circle class="puff p2" cx="182" cy="9" r="4" fill="#EDE7D3"/><circle class="puff p3" cx="182" cy="9" r="4" fill="#EDE7D3"/>
+        </svg>
+      </div>
+      <div class="combine-wrap" style="bottom:184px">
+        <svg viewBox="0 0 220 120">
+          <g class="wheel-rear">
+            <circle cx="112" cy="86" r="22" fill="#1A1A1A"/>
+            <circle cx="112" cy="86" r="22" fill="none" stroke="#F4C51A" stroke-width="3.5" stroke-dasharray="7 5"/>
+            <circle cx="112" cy="86" r="10" fill="#D9D9D9" stroke="#1A1A1A" stroke-width="1.5"/>
+            <circle cx="112" cy="86" r="3" fill="#1A1A1A"/>
+          </g>
+          <rect x="24" y="40" width="108" height="32" rx="6" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1"/>
+          <rect x="24" y="58" width="108" height="6" fill="#12408C"/>
+          <rect x="34" y="30" width="60" height="12" rx="6" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1"/>
+          <rect x="28" y="13" width="10" height="5" rx="2" fill="#333333"/>
+          <rect x="30" y="16" width="6" height="18" rx="2" fill="#1A1A1A"/>
+          <polygon points="118,50 118,22 140,14 152,34 152,50" fill="#F4C51A" stroke="#1A1A1A" stroke-width="1.2"/>
+          <polygon points="122,44 122,26 138,19 146,36 146,44" fill="#2A3540" opacity="0.9"/>
+          <circle cx="132" cy="32" r="4" fill="#0A0A0A" opacity="0.5"/>
+          <rect x="152" y="78" width="60" height="12" rx="2" fill="#1A1A1A"/>
+          <polygon points="212,78 220,84 212,90" fill="#1A1A1A"/>
+          <line x1="156" y1="90" x2="160" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="164" y1="90" x2="168" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="172" y1="90" x2="176" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="180" y1="90" x2="184" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="188" y1="90" x2="192" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="196" y1="90" x2="200" y2="84" stroke="#F4C51A" stroke-width="1.5"/>
+          <line x1="158" y1="66" x2="158" y2="78" stroke="#1A1A1A" stroke-width="2"/>
+          <line x1="206" y1="66" x2="206" y2="78" stroke="#1A1A1A" stroke-width="2"/>
+          <g class="reel-spin">
+            <line x1="158" y1="66" x2="206" y2="66" stroke="#333333" stroke-width="2.5"/>
+            <line x1="182" y1="52" x2="182" y2="80" stroke="#333333" stroke-width="2.5"/>
+            <line x1="167" y1="57" x2="197" y2="75" stroke="#333333" stroke-width="2"/>
+            <line x1="167" y1="75" x2="197" y2="57" stroke="#333333" stroke-width="2"/>
+          </g>
+          <g class="wheel-front">
+            <circle cx="34" cy="94" r="12" fill="#1A1A1A"/>
+            <circle cx="34" cy="94" r="12" fill="none" stroke="#F4C51A" stroke-width="2.5" stroke-dasharray="4 4"/>
+            <circle cx="34" cy="94" r="3.5" fill="#F4C51A"/>
+          </g>
+          <circle class="dust d1" cx="18" cy="100" r="4" fill="#D9A73B"/>
+          <circle class="dust d2" cx="10" cy="102" r="3" fill="#D9A73B"/>
+        </svg>
+      </div>
+      <div class="kicker-wrap"><span class="kicker on-dark rv rv-up d0">Administração Rural</span></div>
+      <div class="col" style="gap:24px;flex:1;justify-content:center">
+        <div class="icon-wrap lg rv rv-rot d1 pulse-icon"><svg viewBox="0 0 24 24"><use href="#icon-thumb"></use></svg></div>
+        <h1 class="hero rv rv-pop d2" style="font-size:92px">Obrigado!</h1>
+        <p class="lead rv rv-up d3" style="font-size:29px">Finanças no agronegócio — controle de custos, fluxo de caixa e crédito rural. Perguntas e discussão.</p>
+      </div>
+      <div class="row between end" style="border-top:1px solid rgba(245,241,227,.25);padding-top:30px">
+        <div class="col rv rv-left d4" style="gap:8px">
+          <p style="font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--gold)">Docente</p>
+          <p style="font-size:26px;color:var(--cream-text)">Dr. Raposo</p>
+        </div>
+        <div class="col rv rv-right d5" style="gap:8px;text-align:right">
+          <p style="font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--gold)">Discentes</p>
+          <p style="font-size:26px;color:var(--cream-text)">Antonio Francisco de Araújo Neto · Sammy Dourado · Davi Ferreira · Samuel Angelozy</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="nav" id="nav">
+  <button id="prevBtn" aria-label="Anterior">‹</button>
+  <span id="counter">01 / 15</span>
+  <button id="nextBtn" aria-label="Próximo">›</button>
+  <button id="fsBtn" aria-label="Tela cheia" style="margin-left:4px">⛶</button>
+</div>
+<div class="hint" id="hint">← → navega entre slides · F tela cheia · os elementos animam sozinhos</div>
+
+<script>
+(function(){
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var total = slides.length;
+  var current = 0;
+  var stage = document.getElementById('stage');
+  var progress = document.getElementById('progress');
+  var counter = document.getElementById('counter');
+  var nav = document.getElementById('nav');
+  var hint = document.getElementById('hint');
+
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+
+  function render(){
+    slides.forEach(function(el, i){
+      el.classList.remove('active', 'before', 'after');
+      if(i === current) el.classList.add('active');
+      else if(i < current) el.classList.add('before');
+      else el.classList.add('after');
+    });
+    progress.style.width = ((current + 1) / total * 100) + '%';
+    counter.textContent = pad(current + 1) + ' / ' + pad(total);
+  }
+
+  function nudge(id){
+    var b = document.getElementById(id);
+    b.classList.remove('nudge');
+    void b.offsetWidth;
+    b.classList.add('nudge');
+  }
+
+  function next(){ if(current < total - 1){ current++; render(); wake(); } else nudge('nextBtn'); }
+  function prev(){ if(current > 0){ current--; render(); wake(); } else nudge('prevBtn'); }
+  function go(i){ current = Math.max(0, Math.min(total - 1, i)); render(); wake(); }
+
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.getElementById('fsBtn').addEventListener('click', function(){
+    if(!document.fullscreenElement){ document.documentElement.requestFullscreen && document.documentElement.requestFullscreen(); }
+    else { document.exitFullscreen && document.exitFullscreen(); }
+  });
+
+  window.addEventListener('keydown', function(e){
+    if(['ArrowRight','ArrowDown','PageDown',' '].indexOf(e.key) !== -1){ e.preventDefault(); next(); }
+    else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key) !== -1){ e.preventDefault(); prev(); }
+    else if(e.key === 'Home'){ e.preventDefault(); go(0); }
+    else if(e.key === 'End'){ e.preventDefault(); go(total - 1); }
+    else if(e.key.toLowerCase() === 'f'){ document.getElementById('fsBtn').click(); }
+  });
+
+  /* scale the fixed 1920x1080 stage to fit the viewport */
+  function fit(){
+    var sw = window.innerWidth / 1920;
+    var sh = window.innerHeight / 1080;
+    var scale = Math.min(sw, sh) * 0.96;
+    stage.style.transform = 'scale(' + scale + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  /* auto-hide nav after idle */
+  var idleTimer;
+  function wake(){
+    nav.classList.remove('idle'); hint.classList.remove('idle');
+    clearTimeout(idleTimer);
+    idleTimer = setTimeout(function(){ nav.classList.add('idle'); hint.classList.add('idle'); }, 3200);
+  }
+  window.addEventListener('mousemove', wake);
+  window.addEventListener('click', wake);
+  wake();
+
+  render();
+})();
+</script>
+</body>
+</html>
+x
