@@ -217,6 +217,10 @@ table.tbl tr:nth-child(odd):not(:first-child){background:var(--card);}
 .vid-progress-track{width:100%;height:6px;border-radius:3px;background:rgba(255,255,255,.28);position:relative;}
 .vid-progress-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:var(--gold);border-radius:3px;}
 .vid-time{color:#fff;font-size:14px;font-variant-numeric:tabular-nums;flex-shrink:0;}
+.vid-credit{position:absolute;top:14px;left:14px;z-index:1;display:flex;align-items:center;gap:7px;
+  padding:7px 14px 7px 10px;border-radius:999px;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);
+  color:#fff;font-size:14px;font-weight:600;text-decoration:none;}
+.vid-credit svg{width:16px;height:16px;flex-shrink:0;}
 
 /* ---------- nav ui ---------- */
 .progress{position:fixed;top:0;left:0;height:5px;background:linear-gradient(90deg,var(--gold),#e8c25f);
@@ -313,6 +317,9 @@ table.tbl tr:nth-child(odd):not(:first-child){background:var(--card);}
 </symbol>
 <symbol id="icon-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <line x1="3" y1="12" x2="20" y2="12"/><polyline points="14,6 20,12 14,18"/>
+</symbol>
+<symbol id="icon-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="0.6" fill="currentColor" stroke="none"/>
 </symbol>
 </defs>
 </svg>
@@ -980,6 +987,10 @@ table.tbl tr:nth-child(odd):not(:first-child){background:var(--card);}
             <source src="assets/encerramento-video.mp4" type="video/mp4">
             Seu navegador não suporta vídeo embutido.
           </video>
+          <a class="vid-credit" href="https://www.instagram.com/stefani.barbosa.agro/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24"><use href="#icon-instagram"></use></svg>
+            <span>@stefani.barbosa.agro</span>
+          </a>
           <div class="vid-controls">
             <button class="vid-play" id="vidPlayBtn" type="button" aria-label="Reproduzir">
               <svg viewBox="0 0 24 24" width="16" height="16"><path class="ic-play" d="M8 5v14l11-7z" fill="currentColor"/><g class="ic-pause" style="display:none"><rect x="6" y="5" width="4" height="14" fill="currentColor"/><rect x="14" y="5" width="4" height="14" fill="currentColor"/></g></svg>
